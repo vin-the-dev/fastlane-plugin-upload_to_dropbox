@@ -69,8 +69,13 @@ module Fastlane
         
         UI.message params[:is_ipa]
 
-        if params[:is_ipa]
+        fileName = destination_path(params)
+        extname = File.extname(fileName)
+        if extname == '.ipa'
           dropboxDirectLink = shareLink.sub('?dl=0','?dl=1')
+        elsif extname == '.plist' then
+          dropboxDirectLink = shareLink.sub('https://www.dropbox.com/s/', 'https://dl.dropboxusercontent.com/s/')
+          dropboxDirectLink = dropboxDirectLink.sub('?dl=0','')
         else
           dropboxDirectLink = shareLink.sub('https://www.dropbox.com/s/', 'https://dl.dropboxusercontent.com/s/')
           dropboxDirectLink = dropboxDirectLink.sub('?dl=0','')
