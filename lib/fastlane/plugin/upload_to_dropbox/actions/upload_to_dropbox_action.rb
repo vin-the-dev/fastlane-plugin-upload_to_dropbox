@@ -11,9 +11,9 @@ module Fastlane
 
       def self.run(params)
         UI.message ''
-        UI.message "Starting upload of #{params[:file_path]} to Dropbox"
+        UI.message "Starting upload of #{params[:file_path]} to Dropbox 1"
         UI.message ''
-
+        
         params[:keychain] ||= default_keychain
 
         write_mode =
@@ -32,14 +32,17 @@ module Fastlane
             params[:write_mode]
           end
 
-        access_token = get_token_from_keychain(params[:keychain], params[:keychain_password])
-        unless access_token
-          access_token = request_token(params[:app_key], params[:app_secret])
-          unless save_token_to_keychain(params[:keychain], access_token)
-            UI.user_error! 'Failed to store access token in the keychain'
+        if params[:access_token].nil? 
+          access_token = get_token_from_keychain(params[:keychain], params[:keychain_password])
+          unless access_token
+            access_token = request_token(params[:app_key], params[:app_secret])
+            unless save_token_to_keychain(params[:keychain], access_token)
+              UI.user_error! 'Failed to store access token in the keychain'
+            end
           end
+        else
+          access_token = params[:access_token]
         end
-
         client = DropboxApi::Client.new(access_token)
 
         #delete file
@@ -267,6 +270,11 @@ module Fastlane
                                        description: 'Uploading iPA?',
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :access_token,
+                                      env_name: 'ACCESS_TOKEN',
+                                      description: 'Access token for dropbox',
+                                      type: String,
+                                      optional: true)
         ]
       end
 
