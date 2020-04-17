@@ -67,26 +67,10 @@ module Fastlane
         UI.message "Uploading file success"
         
         shareLink = client.create_shared_link_with_settings(destination_path(params)).url
-        # shareLink = shareLink.split('https://www.dropbox.com/s/')
-        # shareLink = shareLink.at(1)
-        
-        UI.message params[:is_ipa]
 
-        fileName = destination_path(params)
-        extname = File.extname(fileName)
-        if extname == '.ipa'
-          dropboxDirectLink = shareLink.sub('?dl=0','?dl=1')
-        elsif extname == '.plist' then
-          dropboxDirectLink = shareLink.sub('https://www.dropbox.com/s/', 'https://dl.dropboxusercontent.com/s/')
-          dropboxDirectLink = dropboxDirectLink.sub('?dl=0','')
-        else
-          dropboxDirectLink = shareLink.sub('https://www.dropbox.com/s/', 'https://dl.dropboxusercontent.com/s/')
-          dropboxDirectLink = dropboxDirectLink.sub('?dl=0','')
-        end
+        Actions.lane_context[SharedValues::DROPBOX_UPLOADED_FILE_URL] = shareLink
 
-        Actions.lane_context[SharedValues::DROPBOX_UPLOADED_FILE_URL] = dropboxDirectLink
-
-        UI.message dropboxDirectLink
+        UI.message shareLink
         if output_file.name != File.basename(params[:file_path])
           UI.user_error! 'Failed to upload file to Dropbox'
         else
